@@ -1,0 +1,1 @@
+export { Cameraroll } from './native';

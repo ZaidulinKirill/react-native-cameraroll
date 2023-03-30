@@ -1,18 +1,24 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-gallery';
+import { getAssets } from 'react-native-gallery';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  const [result, setResult] = React.useState<any>();
 
   React.useEffect(() => {
-    multiply(3, 7).then(setResult);
+    getAssets({
+      limit: 25,
+      // sortBy: ['test', 'fest'],
+    } as any).then((items) => {
+      console.log(items);
+      setResult(JSON.stringify(items));
+    });
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Result: {JSON.stringify(result)}</Text>
     </View>
   );
 }

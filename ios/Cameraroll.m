@@ -2,7 +2,7 @@
 
 @interface RCT_EXTERN_MODULE(Cameraroll, NSObject)
 
-RCT_EXTERN_METHOD(multiply:(float)a withB:(float)b
+RCT_EXTERN_METHOD(getAssets:(NSDictionary *)params
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 
