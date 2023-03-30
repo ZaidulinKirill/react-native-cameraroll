@@ -1,17 +1,17 @@
-# react-native-cameraroll
+# react-native-gallery
 
 React Native Camera Roll for iOS & Android
 
 ## Installation
 
 ```sh
-npm install react-native-cameraroll
+npm install react-native-gallery
 ```
 
 ## Usage
 
 ```js
-import { multiply } from 'react-native-cameraroll';
+import { multiply } from 'react-native-gallery';
 
 // ...
 

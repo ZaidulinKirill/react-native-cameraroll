@@ -1,5 +1,5 @@
 {
-  "name": "react-native-cameraroll",
+  "name": "react-native-gallery",
   "version": "0.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -41,13 +41,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/ZaidulinKirill/react-native-cameraroll",
+  "repository": "https://github.com/ZaidulinKirill/react-native-gallery",
   "author": "Kirill Zaidulin <zaidulinkirill@gmail.com> (https://github.com/ZaidulinKirill)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ZaidulinKirill/react-native-cameraroll/issues"
+    "url": "https://github.com/ZaidulinKirill/react-native-gallery/issues"
   },
-  "homepage": "https://github.com/ZaidulinKirill/react-native-cameraroll#readme",
+  "homepage": "https://github.com/ZaidulinKirill/react-native-gallery#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
