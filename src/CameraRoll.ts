@@ -17,8 +17,6 @@ export class CameraRoll {
    * roll of the device matching shape defined by `getPhotosReturnChecker`.
    */
   static async getAssets(params: GetAssetsParams): Promise<GetAssetsResult> {
-    // "uri": asset.mediaType != .video ? "ph://\(asset.localIdentifier)" : "",
-
     const result = await RNCameraroll.getAssets(
       Platform.select({
         ios: {
@@ -60,6 +58,9 @@ export class CameraRoll {
               item.ext && { extension: item.ext.toLowerCase() }),
             ...(params?.select?.includes('uri') && {
               uri: `ph://${item.id}`,
+            }),
+            ...(params?.select?.includes('isFavourite') && {
+              isFavourite: item.isFavourite,
             }),
           };
         }

@@ -13,17 +13,26 @@ class Cameraroll: NSObject {
         let limit = params["limit"] as? Int
         let sortBy = params["sortBy"] as? [[String: Any]]
         let select = params["select"] as? [String]
+        let assetType = params["assetType"] as? String
         
         let options = PHFetchOptions()
         options.sortDescriptors = sortBy?.map({ sortDict in
             NSSortDescriptor(key: sortDict["key"] as? String, ascending: sortDict["asc"] as! Bool)
         })
-        
-        let isPaginationEnabled = skip != nil && limit != nil
-        if (!isPaginationEnabled) {
-            options.fetchLimit = limit ?? 0
+
+        var predicates = [NSPredicate]()
+        if (assetType == "image") {
+            predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.image.rawValue))
         }
         
+        if (assetType == "video") {
+            predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.video.rawValue))
+        }
+        
+        if (predicates.count > 0) {
+            options.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        }
+
         let result = PHAsset.fetchAssets(with: options)
 
         let from = skip ?? 0
@@ -42,7 +51,8 @@ class Cameraroll: NSObject {
             "name": select?.contains("name") ?? false,
             "type": select?.contains("type") ?? false,
             "size": select?.contains("size") ?? false,
-            "ext": select?.contains("ext") ?? false
+            "ext": select?.contains("ext") ?? false,
+            "isFavourite": select?.contains("isFavourite") ?? false
         ]
         
         let items = assets.map({ asset in
@@ -59,6 +69,7 @@ class Cameraroll: NSObject {
             if (includes["type"]!) { dict["type"] = asset.mediaType.rawValue }
             if (includes["size"]!) { dict["size"] = size ?? -1 }
             if (includes["ext"]!) { dict["ext"] = ext ?? "" }
+            if (includes["isFavourite"]!) { dict["isFavourite"] = asset.isFavorite }
             
             return dict
         })

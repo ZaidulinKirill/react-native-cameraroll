@@ -7,12 +7,24 @@ export type SortByKey =
   | 'hidden'
   | 'fileSize';
 
-export type SelectKey = 'id' | 'name' | 'type' | 'size' | 'extension' | 'uri';
+export type SelectKey =
+  | 'id'
+  | 'name'
+  | 'type'
+  | 'size'
+  | 'extension'
+  | 'uri'
+  | 'isFavourite';
 
 /**
  * Fetching params
  */
 export type GetAssetsParams = {
+  /**
+   * Asset type
+   */
+  assetType?: 'image' | 'video' | 'all';
+
   /**
    * Number of photos/videos you want to skip
    */

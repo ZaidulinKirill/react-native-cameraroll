@@ -17,14 +17,9 @@ export default function App() {
 
       const { items, total } = await getAssets({
         skip: 0,
-        limit: 1,
-        sortBy: [
-          {
-            key: 'hidden',
-            asc: true,
-          },
-        ],
-        select: ['id', 'uri'],
+        limit: 100,
+        select: ['isFavourite'],
+        assetType: 'all',
       });
 
       console.log({ items: items, length: items.length, total });
