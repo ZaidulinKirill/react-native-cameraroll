@@ -80,6 +80,34 @@ class Cameraroll: NSObject {
         ])
     }
     
+    @objc(editAsset:withValues:withResolver:withRejecter:)
+    func editAsset(id: String, values: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let fetchOptions = PHFetchOptions()
+        fetchOptions.predicate = NSPredicate(format: "localIdentifier = %@", id)
+        fetchOptions.fetchLimit = 1
+
+        let result = PHAsset.fetchAssets(with: fetchOptions)
+        guard let asset = result.firstObject else {
+            reject("Not found", "Asset not found", nil);
+            return
+        }
+        
+        let isFavourite = values["isFavourite"] as? Bool
+                
+        PHPhotoLibrary.shared().performChanges({
+            let request = PHAssetChangeRequest(for: asset)
+            if (isFavourite != nil) {
+                request.isFavorite = isFavourite!
+            }
+        }, completionHandler: { success, error in
+            if success {
+                resolve(true)
+            } else {
+                reject("Error", error.debugDescription, nil)
+            }
+        })
+    }
+
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {
         var statuses = [PHAuthorizationStatus.authorized]
         if #available(iOS 14, *) {

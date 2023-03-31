@@ -7,14 +7,14 @@
 import { Platform } from 'react-native';
 import { RNCameraroll } from './CameraRollNative';
 import type { GetAssetsParams, GetAssetsResult } from './types';
+import type { EditAssetResult, EditAssetValues } from './types/editAsset';
 
 /**
  * `CameraRoll` provides access to the local camera roll or photo library.
  */
 export class CameraRoll {
   /**
-   * Returns a Promise with photo identifier objects from the local camera
-   * roll of the device matching shape defined by `getPhotosReturnChecker`.
+   * Fetch assets from your local gallery
    */
   static async getAssets(params: GetAssetsParams): Promise<GetAssetsResult> {
     const result = await RNCameraroll.getAssets(
@@ -77,5 +77,17 @@ export class CameraRoll {
         throw new Error('Not implemented');
       }),
     };
+  }
+
+  /**
+   * Edit gallery asset
+   */
+  static async editAsset(
+    id: string,
+    values: EditAssetValues
+  ): Promise<EditAssetResult> {
+    const result = await RNCameraroll.editAsset(id, values);
+
+    return result;
   }
 }
