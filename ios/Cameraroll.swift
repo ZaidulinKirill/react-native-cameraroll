@@ -9,23 +9,64 @@ class Cameraroll: NSObject {
             return
         }
 
+        let skip = params["skip"] as? Int
         let limit = params["limit"] as? Int
         let sortBy = params["sortBy"] as? [[String: Any]]
+        let select = params["select"] as? [String]
         
         let options = PHFetchOptions()
         options.sortDescriptors = sortBy?.map({ sortDict in
             NSSortDescriptor(key: sortDict["key"] as? String, ascending: sortDict["asc"] as! Bool)
         })
-        options.fetchLimit = limit ?? 0
+        
+        let isPaginationEnabled = skip != nil && limit != nil
+        if (!isPaginationEnabled) {
+            options.fetchLimit = limit ?? 0
+        }
         
         let result = PHAsset.fetchAssets(with: options)
-        var assets = [PHAsset]()
 
-        result.enumerateObjects { (asset, _, _) in
-            assets.append(asset)
+        let from = skip ?? 0
+        let to = min((skip ?? 0) + (limit ?? result.count), result.count) - 1
+
+        var assets = [PHAsset]()
+        if (from < result.count) {
+            let indexes = Array(from...to)
+            result.enumerateObjects(at: IndexSet(indexes)) { (asset, _, _) in
+                assets.append(asset)
+            }
         }
 
-        resolve(assets)
+        let includes = [
+            "id": select == nil || select!.contains("id"),
+            "name": select?.contains("name") ?? false,
+            "type": select?.contains("type") ?? false,
+            "size": select?.contains("size") ?? false,
+            "ext": select?.contains("ext") ?? false
+        ]
+        
+        let items = assets.map({ asset in
+            let resources = PHAssetResource.assetResources(for: asset)
+            let resource = resources.first
+            let size = resource?.value(forKey: "fileSize") as? CLong
+            let originalFilename = resource?.originalFilename
+            let filename = asset.value(forKey: "filename") as? NSString
+            let ext = filename?.pathExtension
+
+            var dict = [String: Any]()
+            if (includes["id"]!) { dict["id"] = asset.localIdentifier }
+            if (includes["name"]!) { dict["name"] = originalFilename ?? "" }
+            if (includes["type"]!) { dict["type"] = asset.mediaType.rawValue }
+            if (includes["size"]!) { dict["size"] = size ?? -1 }
+            if (includes["ext"]!) { dict["ext"] = ext ?? "" }
+            
+            return dict
+        })
+
+        resolve([
+            "total": result.count,
+            "items": items
+        ])
     }
     
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {

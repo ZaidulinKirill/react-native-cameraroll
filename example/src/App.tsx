@@ -2,18 +2,34 @@ import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
 import { getAssets } from 'react-native-gallery';
+import { request, PERMISSIONS } from 'react-native-permissions';
 
 export default function App() {
   const [result, setResult] = React.useState<any>();
 
   React.useEffect(() => {
-    getAssets({
-      limit: 25,
-      // sortBy: ['test', 'fest'],
-    } as any).then((items) => {
-      console.log(items);
+    (async () => {
+      const status = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+      console.log(status);
+      if (!['granted', 'limited'].includes(status)) {
+        return;
+      }
+
+      const { items, total } = await getAssets({
+        skip: 0,
+        limit: 1,
+        sortBy: [
+          {
+            key: 'hidden',
+            asc: true,
+          },
+        ],
+        select: ['id', 'uri'],
+      });
+
+      console.log({ items: items, length: items.length, total });
       setResult(JSON.stringify(items));
-    });
+    })();
   }, []);
 
   return (
