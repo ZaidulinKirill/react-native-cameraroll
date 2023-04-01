@@ -32,13 +32,13 @@ export default function App() {
       {result?.[0] && (
         <TouchableOpacity
           onPress={async () => {
-            console.log(deleteAssets);
-            // console.log(result[0].id);
-            // const ss = await editAsset(result[0].id, {
-            //   isFavourite: !result[0].isFavourite,
-            // });
-            // console.log(ss);
-            console.log(await deleteAssets([result[0].id, result[1].id]));
+            // console.log(deleteAssets);
+            // // console.log(result[0].id);
+            // // const ss = await editAsset(result[0].id, {
+            // //   isFavourite: !result[0].isFavourite,
+            // // });
+            // // console.log(ss);
+            // console.log(await deleteAssets([result[0].id, result[1].id]));
           }}
         >
           <Text>Click</Text>
