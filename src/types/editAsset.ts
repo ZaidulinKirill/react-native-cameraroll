@@ -7,8 +7,3 @@ export type EditAssetValues = {
    */
   isFavourite?: boolean;
 };
-
-/**
- * Result of editAsset method
- */
-export type EditAssetResult = {};

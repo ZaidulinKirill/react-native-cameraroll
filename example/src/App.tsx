@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { getAssets, editAsset } from 'react-native-gallery';
+import { getAssets, editAsset, deleteAssets } from 'react-native-gallery';
 import { request, PERMISSIONS } from 'react-native-permissions';
 
 export default function App() {
@@ -17,12 +17,12 @@ export default function App() {
 
       const { items, total } = await getAssets({
         skip: 0,
-        limit: 1,
+        limit: 6,
         select: ['id', 'isFavourite'],
         assetType: 'all',
       });
 
-      console.log({ items: items, length: items.length, total });
+      //console.log({ items: items, length: items.length, total });
       setResult(items);
     })();
   }, []);
@@ -32,11 +32,13 @@ export default function App() {
       {result?.[0] && (
         <TouchableOpacity
           onPress={async () => {
-            console.log(result[0].id);
-            const ss = await editAsset(result[0].id, {
-              isFavourite: !result[0].isFavourite,
-            });
-            console.log(ss);
+            console.log(deleteAssets);
+            // console.log(result[0].id);
+            // const ss = await editAsset(result[0].id, {
+            //   isFavourite: !result[0].isFavourite,
+            // });
+            // console.log(ss);
+            console.log(await deleteAssets([result[0].id, result[1].id]));
           }}
         >
           <Text>Click</Text>

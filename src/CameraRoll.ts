@@ -7,7 +7,7 @@
 import { Platform } from 'react-native';
 import { RNCameraroll } from './CameraRollNative';
 import type { GetAssetsParams, GetAssetsResult } from './types';
-import type { EditAssetResult, EditAssetValues } from './types/editAsset';
+import type { EditAssetValues } from './types/editAsset';
 
 /**
  * `CameraRoll` provides access to the local camera roll or photo library.
@@ -82,12 +82,14 @@ export class CameraRoll {
   /**
    * Edit gallery asset
    */
-  static async editAsset(
-    id: string,
-    values: EditAssetValues
-  ): Promise<EditAssetResult> {
-    const result = await RNCameraroll.editAsset(id, values);
+  static async editAsset(id: string, values: EditAssetValues): Promise<void> {
+    await RNCameraroll.editAsset(id, values);
+  }
 
-    return result;
+  /**
+   * Delete gallery assets
+   */
+  static deleteAssets(ids: string[]): Promise<boolean> {
+    return RNCameraroll.deleteAssets(ids);
   }
 }
