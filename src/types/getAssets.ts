@@ -1,18 +1,15 @@
 export type SortByKey =
   | 'creationDate'
   | 'modificationDate'
-  | 'duration'
   | 'mediaType'
-  | 'favorite'
-  | 'hidden'
   | 'fileSize';
 
 export type SelectKey =
   | 'id'
   | 'name'
-  | 'type'
+  | 'mediaType'
   | 'size'
-  | 'extension'
+  | 'creationDate'
   | 'uri'
   | 'isFavourite';
 
@@ -21,9 +18,9 @@ export type SelectKey =
  */
 export type GetAssetsParams = {
   /**
-   * Asset type
+   * Media type
    */
-  assetType?: 'image' | 'video' | 'all';
+  mediaType?: 'image' | 'video' | 'all';
 
   /**
    * Number of photos/videos you want to skip

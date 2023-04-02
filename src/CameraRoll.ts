@@ -21,17 +21,28 @@ export class CameraRoll {
       Platform.select({
         ios: {
           ...params,
-          select: params.select
-            ?.map((x) => {
-              if (x === 'extension') {
-                return 'ext';
+          select: params.select,
+        },
+        android: {
+          ...params,
+          sortBy: params.sortBy?.map((x) => {
+            const key = (() => {
+              if (x.key === 'creationDate') {
+                return 'date_added';
+              } else if (x.key === 'modificationDate') {
+                return 'date_modified';
+              } else if (x.key === 'fileSize') {
+                return '_size';
+              } else if (x.key === 'mediaType') {
+                return 'media_type';
               }
 
-              return x;
-            })
-            .filter((x) => !['uri'].includes(x)),
+              return x.key;
+            })();
+
+            return { key, asc: x.asc };
+          }),
         },
-        android: { ...params },
       })
     );
 
@@ -45,19 +56,17 @@ export class CameraRoll {
               item.name && { name: item.name }),
             ...(params?.select?.includes('size') &&
               (item.size || item.size === 0) && { size: item.size }),
-            ...(params?.select?.includes('type') &&
-              (item.type || item.type === 0) && {
+            ...(params?.select?.includes('mediaType') &&
+              (item.mediaType || item.mediaType === 0) && {
                 type:
-                  item.type === 1
+                  item.mediaType === 1
                     ? 'image'
-                    : item.type === 2
+                    : item.mediaType === 2
                     ? 'video'
                     : 'unknown',
               }),
-            ...(params?.select?.includes('extension') &&
-              item.ext && { extension: item.ext.toLowerCase() }),
             ...(params?.select?.includes('uri') && {
-              uri: `ph://${item.id}`,
+              uri: item.uri,
             }),
             ...(params?.select?.includes('isFavourite') && {
               isFavourite: item.isFavourite,
@@ -69,8 +78,20 @@ export class CameraRoll {
           return {
             ...(item.id && { id: item.id }),
             ...(item.name && { name: item.name }),
-            ...((item.size || item.size === 0) && { size: item.size }),
-            ...(item.ext && { extension: item.ext }),
+            ...(item.uri && { uri: item.uri }),
+            ...(item.size && { size: item.size }),
+            ...(item.isFavourite && { isFavourite: item.isFavourite === '1' }),
+            ...(item.mediaType && {
+              mediaType:
+                item.mediaType === 1
+                  ? 'image'
+                  : item.mediaType === 3
+                  ? 'video'
+                  : 'unknown',
+            }),
+            ...(item.creationDate && {
+              creationDate: new Date(parseInt(item.creationDate, 10) * 1000),
+            }),
           };
         }
 

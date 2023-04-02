@@ -82,6 +82,10 @@ class Cameraroll: NSObject {
     
     @objc(editAsset:withValues:withResolver:withRejecter:)
     func editAsset(id: String, values: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        guard checkPhotoLibraryAccess(reject: reject) else {
+            return
+        }
+
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
         guard let asset = fetchResult.firstObject else {
             reject("Not found", "Asset not found", nil);
@@ -106,6 +110,10 @@ class Cameraroll: NSObject {
     
     @objc(deleteAssets:withResolver:withRejecter:)
     func deleteAssets(ids: [String], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+        guard checkPhotoLibraryAccess(reject: reject) else {
+            return
+        }
+
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil)
         if (fetchResult.count == 0) {
             resolve(["success": true])

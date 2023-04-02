@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { getAssets, editAsset, deleteAssets } from 'react-native-gallery';
 import { request, PERMISSIONS } from 'react-native-permissions';
 
@@ -9,17 +15,36 @@ export default function App() {
 
   React.useEffect(() => {
     (async () => {
-      const status = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
-      console.log(status);
-      if (!['granted', 'limited'].includes(status)) {
-        return;
+      if (Platform.OS === 'ios') {
+        const status = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+        console.log(status);
+        if (!['granted', 'limited'].includes(status)) {
+          return;
+        }
+      }
+
+      if (Platform.OS === 'android') {
+        const status = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+        console.log(status);
+        if (!['granted', 'limited'].includes(status)) {
+          return;
+        }
       }
 
       const { items, total } = await getAssets({
-        skip: 0,
-        limit: 6,
-        select: ['id', 'isFavourite'],
-        assetType: 'all',
+        skip: 1,
+        // limit: 1,
+        select: [
+          // 'id',
+          // 'isFavourite',
+          'creationDate',
+          'mediaType',
+          // 'name',
+          // 'size',
+          // 'uri',
+        ],
+        mediaType: 'image',
+        sortBy: [{ key: 'creationDate', asc: false }],
       });
 
       //console.log({ items: items, length: items.length, total });
