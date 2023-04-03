@@ -1,19 +1,36 @@
 package com.cameraroll
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.*
 
 
 class CamerarollModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
+
+  private var launcher: ActivityResultLauncher<Intent>? = null
+
+  fun CamerarollModule(reactContext: ReactApplicationContext?) {
+    super(reactContext)
+    reactContext.registerForActivityResult
+    launcher = registerForActivityResult(StartActivityForResult()) { result ->
+      if (result.getResultCode() === Activity.RESULT_OK) {
+        val data: Intent = result.getData()
+        // handle the result here
+      }
+    }
+  }
 
   override fun getName(): String {
     return NAME
@@ -150,6 +167,44 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
     result.putArray("items", items)
 
     promise.resolve(result)
+  }
+
+  @ReactMethod
+  fun editIsFavorite(id: String, isFavorite: Boolean, promise: Promise) {
+    currentActivity.registerForActivityResult
+    val currentActivity = currentActivity
+    /* getCurrentActivity().reg
+    registerForActivityResul
+    currentActivity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+      if (result.resultCode == Activity.RESULT_OK) {
+        Log.d("deleteResultLauncher", "Android 11 or higher : deleted")
+      }
+    }
+    currentActivity.
+    startActivityForResult
+    val contentResolver = this.reactApplicationContext.contentResolver
+    val uri = Uri.parse(id)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      val pendingIntent = MediaStore.createDeleteRequest(contentResolver, mutableListOf(uri)
+      this.deleteResultLauncher.launch(IntentSenderRequest.Builder(pendingIntent.intentSender).build())
+    }
+  }
+*/
+    /*
+  private fun deleteImages(uris: List<Uri>) {
+    val pendingIntent = MediaStore.createDeleteRequest(contentResolver, uris.filter {
+      checkUriPermission(it, Binder.getCallingPid(), Binder.getCallingUid(), Intent.FLAG_GRANT_WRITE_URI_PERMISSION) != PackageManager.PERMISSION_GRANTED
+    })
+    startIntentSenderForResult(pendingIntent.intentSender, REQ_CODE, null, 0, 0, 0)
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == REQ_CODE && resultCode == Activity.RESULT_OK) {
+      // Image deleted successfully
+    }
+  }*/
   }
 
   private fun getSort(sortBy: ReadableArray?): String? {
