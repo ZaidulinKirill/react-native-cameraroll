@@ -1,5 +1,5 @@
 {
-  "name": "react-native-gallery",
+  "name": "@kirz/react-native-gallery",
   "version": "0.1.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -30,8 +30,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepack": "bob build",
-    "release": "release-it",
+    "prepare": "bob build && npx tsc-alias -p tsconfig.json && npx tsc-alias -p tsconfig.module.json && npx tsc-alias -p tsconfig.typescript.json",
+    "release": "npm publish --access public",
     "example": "yarn --cwd example",
     "bootstrap": "yarn example && yarn install && yarn example pods",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build"

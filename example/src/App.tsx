@@ -31,7 +31,7 @@ export default function App() {
         }
       }
 
-      const { items, total } = await getAssets({
+      const { items } = await getAssets({
         skip: 1,
         // limit: 1,
         select: [
