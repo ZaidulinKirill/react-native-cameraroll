@@ -7,7 +7,6 @@
 import { Platform } from 'react-native';
 import { RNCameraroll } from './CameraRollNative';
 import type { GetAssetsParams, GetAssetsResult } from './types';
-import type { EditAssetValues } from './types/editAsset';
 
 /**
  * `CameraRoll` provides access to the local camera roll or photo library.
@@ -54,8 +53,6 @@ export class CameraRoll {
             ...(params?.select?.includes('id') && item.id && { id: item.id }),
             ...(params?.select?.includes('name') &&
               item.name && { name: item.name }),
-            ...(params?.select?.includes('size') &&
-              (item.size || item.size === 0) && { size: item.size }),
             ...(params?.select?.includes('mediaType') &&
               (item.mediaType || item.mediaType === 0) && {
                 type:
@@ -65,11 +62,17 @@ export class CameraRoll {
                     ? 'video'
                     : 'unknown',
               }),
+            ...(params?.select?.includes('size') &&
+              (item.size || item.size === 0) && { size: item.size }),
+            ...(params?.select?.includes('creationDate') &&
+              item.creationDate !== -1 && {
+                creationDate: new Date(item.creationDate * 1000),
+              }),
             ...(params?.select?.includes('uri') && {
               uri: item.uri,
             }),
-            ...(params?.select?.includes('isFavourite') && {
-              isFavourite: item.isFavourite,
+            ...(params?.select?.includes('isFavorite') && {
+              isFavorite: item.isFavorite,
             }),
           };
         }
@@ -80,7 +83,7 @@ export class CameraRoll {
             ...(item.name && { name: item.name }),
             ...(item.uri && { uri: item.uri }),
             ...(item.size && { size: item.size }),
-            ...(item.isFavourite && { isFavourite: item.isFavourite === '1' }),
+            ...(item.isFavorite && { isFavorite: item.isFavorite === '1' }),
             ...(item.mediaType && {
               mediaType:
                 item.mediaType === 1
@@ -101,16 +104,30 @@ export class CameraRoll {
   }
 
   /**
-   * Edit gallery asset
+   * Fetch assets from your local gallery
    */
-  static async editAsset(id: string, values: EditAssetValues): Promise<void> {
-    await RNCameraroll.editAsset(id, values);
+  static async getAssetsCount(
+    params: Omit<GetAssetsParams, 'skip' | 'limit' | 'sortBy' | 'select'>
+  ): Promise<{ total: number }> {
+    const result = await RNCameraroll.getAssets({ ...params, totalOnly: true });
+
+    return result;
+  }
+
+  /**
+   * Edit isFavorite value
+   */
+  static async editIsFavorite(
+    id: string,
+    value: boolean
+  ): Promise<{ success: boolean }> {
+    return RNCameraroll.editIsFavorite(id, value);
   }
 
   /**
    * Delete gallery assets
    */
-  static deleteAssets(ids: string[]): Promise<boolean> {
+  static deleteAssets(ids: string[]): Promise<{ success: boolean }> {
     return RNCameraroll.deleteAssets(ids);
   }
 }

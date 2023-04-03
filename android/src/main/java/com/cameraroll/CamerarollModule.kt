@@ -56,7 +56,7 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
       "uri" to (select == null || select.contains("uri")),
       "name" to (select?.contains("uri") ?: false),
       "size" to (select?.contains("size") ?: false),
-      "isFavourite" to (select?.contains("isFavourite") ?: false),
+      "isFavorite" to (select?.contains("isFavorite") ?: false),
       "creationDate" to (select?.contains("creationDate") ?: false),
       "mediaType" to (select?.contains("mediaType") ?: false),
     )
@@ -138,9 +138,9 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-          if (includes["isFavourite"] == true) {
-            val isFavourite = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.IS_FAVORITE))
-            dict.putString("isFavourite", isFavourite)
+          if (includes["isFavorite"] == true) {
+            val isFavorite = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.IS_FAVORITE))
+            dict.putString("isFavorite", isFavorite)
           }
         }
 
@@ -249,7 +249,7 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
       if ("id" in includes || "uri" in includes) MediaStore.Files.FileColumns._ID else null,
       if ("name" in includes) MediaStore.Files.FileColumns.DISPLAY_NAME else null,
       if ("size" in includes) MediaStore.Files.FileColumns.SIZE else null,
-      if ("isFavourite" in includes && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) MediaStore.Files.FileColumns.IS_FAVORITE else null,
+      if ("isFavorite" in includes && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) MediaStore.Files.FileColumns.IS_FAVORITE else null,
       if ("creationDate" in includes) MediaStore.Files.FileColumns.DATE_ADDED else null,
       if ("mediaType" in includes || "uri" in includes || (mediaType != "image" && mediaType != "video")) MediaStore.Files.FileColumns.MEDIA_TYPE else null,
     ).filterNotNull()

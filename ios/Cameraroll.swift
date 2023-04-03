@@ -13,7 +13,8 @@ class Cameraroll: NSObject {
         let limit = params["limit"] as? Int
         let sortBy = params["sortBy"] as? [[String: Any]]
         let select = params["select"] as? [String]
-        let assetType = params["assetType"] as? String
+        let mediaType = params["mediaType"] as? String
+        let totalOnly = params["totalOnly"] as? Bool
         
         let options = PHFetchOptions()
         options.sortDescriptors = sortBy?.map({ sortDict in
@@ -21,11 +22,11 @@ class Cameraroll: NSObject {
         })
 
         var predicates = [NSPredicate]()
-        if (assetType == "image") {
+        if (mediaType == "image") {
             predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.image.rawValue))
         }
         
-        if (assetType == "video") {
+        if (mediaType == "video") {
             predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.video.rawValue))
         }
         
@@ -33,15 +34,30 @@ class Cameraroll: NSObject {
             options.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
 
-        let result = PHAsset.fetchAssets(with: options)
+        if (skip == nil && limit != nil && totalOnly != true) {
+            options.fetchLimit = limit!
+        }
 
-        let from = skip ?? 0
-        let to = min((skip ?? 0) + (limit ?? result.count), result.count) - 1
+        let result = PHAsset.fetchAssets(with: options)
+        if (totalOnly == true) {
+            resolve(["total": result.count])
+            return
+        }
 
         var assets = [PHAsset]()
-        if (from < result.count) {
-            let indexes = Array(from...to)
-            result.enumerateObjects(at: IndexSet(indexes)) { (asset, _, _) in
+        
+        if (skip != nil) {
+            let from = skip!
+            let to = min((from) + (limit ?? result.count), result.count) - 1
+
+            if (from < result.count) {
+                let indexes = Array(from...to)
+                result.enumerateObjects(at: IndexSet(indexes)) { (asset, _, _) in
+                    assets.append(asset)
+                }
+            }
+        } else {
+            result.enumerateObjects { (asset, _, _) in
                 assets.append(asset)
             }
         }
@@ -49,10 +65,11 @@ class Cameraroll: NSObject {
         let includes = [
             "id": select == nil || select!.contains("id"),
             "name": select?.contains("name") ?? false,
-            "type": select?.contains("type") ?? false,
+            "mediaType": select?.contains("mediaType") ?? false,
             "size": select?.contains("size") ?? false,
-            "ext": select?.contains("ext") ?? false,
-            "isFavourite": select?.contains("isFavourite") ?? false
+            "creationDate": select?.contains("creationDate") ?? false,
+            "uri": select?.contains("uri") ?? false,
+            "isFavorite": select?.contains("isFavorite") ?? false
         ]
         
         let items = assets.map({ asset in
@@ -61,27 +78,25 @@ class Cameraroll: NSObject {
             let size = resource?.value(forKey: "fileSize") as? CLong
             let originalFilename = resource?.originalFilename
             let filename = asset.value(forKey: "filename") as? NSString
-            let ext = filename?.pathExtension
-
+            let creationDate = asset.creationDate
+            
             var dict = [String: Any]()
             if (includes["id"]!) { dict["id"] = asset.localIdentifier }
             if (includes["name"]!) { dict["name"] = originalFilename ?? "" }
-            if (includes["type"]!) { dict["type"] = asset.mediaType.rawValue }
+            if (includes["mediaType"]!) { dict["mediaType"] = asset.mediaType.rawValue }
             if (includes["size"]!) { dict["size"] = size ?? -1 }
-            if (includes["ext"]!) { dict["ext"] = ext ?? "" }
-            if (includes["isFavourite"]!) { dict["isFavourite"] = asset.isFavorite }
+            if (includes["creationDate"]!) { dict["creationDate"] = creationDate?.timeIntervalSince1970 ?? -1 }
+            if (includes["isFavorite"]!) { dict["isFavorite"] = asset.isFavorite }
+            if (includes["uri"]!) { dict["uri"] = "ph://\(asset.localIdentifier)" }
             
             return dict
         })
 
-        resolve([
-            "total": result.count,
-            "items": items
-        ])
+        resolve([ "items": items ])
     }
     
-    @objc(editAsset:withValues:withResolver:withRejecter:)
-    func editAsset(id: String, values: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    @objc(editIsFavorite:withValue:withResolver:withRejecter:)
+    func editIsFavorite(id: String, value: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
         }
@@ -92,13 +107,11 @@ class Cameraroll: NSObject {
             return
         }
         
-        let isFavourite = values["isFavourite"] as? Bool
+        let isFavorite = value
                 
         PHPhotoLibrary.shared().performChanges({
             let request = PHAssetChangeRequest(for: asset)
-            if (isFavourite != nil) {
-                request.isFavorite = isFavourite!
-            }
+            request.isFavorite = isFavorite
         }, completionHandler: { success, error in
             if success {
                 resolve(["success": true])

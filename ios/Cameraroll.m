@@ -6,8 +6,8 @@ RCT_EXTERN_METHOD(getAssets:(NSDictionary *)params
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(editAsset:(NSString *)id
-                 withValues:(NSDictionary *)values
+RCT_EXTERN_METHOD(editIsFavorite:(NSString *)id
+                 withValue:(Bool)value
                  withResolver:(RCTPromiseResolveBlock)resolve
                  withRejecter:(RCTPromiseRejectBlock)reject)
 

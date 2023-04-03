@@ -11,7 +11,7 @@ export type SelectKey =
   | 'size'
   | 'creationDate'
   | 'uri'
-  | 'isFavourite';
+  | 'isFavorite';
 
 /**
  * Fetching params
@@ -53,13 +53,10 @@ export type GetAssetsResult = {
   items: {
     id?: string;
     name?: string;
-    type?: 'unknown' | 'video' | 'image';
+    mediaType?: 'unknown' | 'video' | 'image';
     size?: number;
-    extension?: string;
+    creationDate?: Date;
+    uri?: string;
+    isFavorite?: boolean;
   }[];
-
-  /**
-   * Number of total items
-   */
-  total: number;
 };
