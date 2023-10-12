@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Platform } from 'react-native';
+
 import { RNCameraroll } from './CameraRollNative';
 import type { GetAssetsParams, GetAssetsResult } from './types';
 
@@ -42,7 +43,7 @@ export class CameraRoll {
             return { key, asc: x.asc };
           }),
         },
-      })
+      }),
     );
 
     return {
@@ -107,7 +108,7 @@ export class CameraRoll {
    * Fetch assets from your local gallery
    */
   static async getAssetsCount(
-    params: Omit<GetAssetsParams, 'skip' | 'limit' | 'sortBy' | 'select'>
+    params: Omit<GetAssetsParams, 'skip' | 'limit' | 'sortBy' | 'select'>,
   ): Promise<{ total: number }> {
     const result = await RNCameraroll.getAssets({ ...params, totalOnly: true });
 
@@ -119,7 +120,7 @@ export class CameraRoll {
    */
   static async editIsFavorite(
     id: string,
-    value: boolean
+    value: boolean,
   ): Promise<{ success: boolean }> {
     return RNCameraroll.editIsFavorite(id, value);
   }

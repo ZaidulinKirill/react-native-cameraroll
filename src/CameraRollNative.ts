@@ -14,5 +14,5 @@ export const RNCameraroll = NativeModules.Cameraroll
         get() {
           throw new Error(LINKING_ERROR);
         },
-      }
+      },
     );

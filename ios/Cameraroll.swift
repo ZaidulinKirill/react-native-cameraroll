@@ -7,7 +7,7 @@ class Cameraroll: NSObject {
     func getAssets(params: [String: Any], resolve: RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
-        }
+        }§
 
         let skip = params["skip"] as? Int
         let limit = params["limit"] as? Int
