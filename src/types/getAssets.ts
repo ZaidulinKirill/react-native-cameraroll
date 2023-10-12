@@ -23,6 +23,16 @@ export type GetAssetsParams = {
   mediaType?: 'image' | 'video' | 'all';
 
   /**
+   * Collection type
+   */
+  collectionType?: 'album' | 'smartAlbum';
+
+  /**
+   * Collection subtype
+   */
+  collectionSubType?: 'selfies' | 'screenshots' | 'livePhotos' | 'videos';
+
+  /**
    * Number of photos/videos you want to skip
    */
   skip?: number;

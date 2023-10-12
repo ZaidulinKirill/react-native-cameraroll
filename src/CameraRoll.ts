@@ -22,6 +22,36 @@ export class CameraRoll {
         ios: {
           ...params,
           select: params.select,
+          collectionType: (() => {
+            if (params.collectionType === 'album') {
+              return 1;
+            }
+
+            if (params.collectionType === 'smartAlbum') {
+              return 2;
+            }
+
+            return undefined;
+          })(),
+          collectionSubType: (() => {
+            if (params.collectionSubType === 'selfies') {
+              return 210;
+            }
+
+            if (params.collectionSubType === 'screenshots') {
+              return 211;
+            }
+
+            if (params.collectionSubType === 'livePhotos') {
+              return 213;
+            }
+
+            if (params.collectionSubType === 'videos') {
+              return 202;
+            }
+
+            return undefined;
+          })(),
         },
         android: {
           ...params,
@@ -52,6 +82,8 @@ export class CameraRoll {
         if (Platform.OS === 'ios') {
           return {
             ...(params?.select?.includes('id') && item.id && { id: item.id }),
+            ...(params?.select?.includes('uri') &&
+              item.id && { uri: `ph://${item.id}` }),
             ...(params?.select?.includes('name') &&
               item.name && { name: item.name }),
             ...(params?.select?.includes('mediaType') &&

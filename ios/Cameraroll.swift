@@ -7,15 +7,17 @@ class Cameraroll: NSObject {
     func getAssets(params: [String: Any], resolve: RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
-        }§
+        }
 
         let skip = params["skip"] as? Int
         let limit = params["limit"] as? Int
         let sortBy = params["sortBy"] as? [[String: Any]]
         let select = params["select"] as? [String]
         let mediaType = params["mediaType"] as? String
+        let collectionType = params["collectionType"] as? Int
+        let collectionSubType = params["collectionSubType"] as? Int
         let totalOnly = params["totalOnly"] as? Bool
-        
+
         let options = PHFetchOptions()
         options.sortDescriptors = sortBy?.map({ sortDict in
             NSSortDescriptor(key: sortDict["key"] as? String, ascending: sortDict["asc"] as! Bool)
@@ -38,7 +40,16 @@ class Cameraroll: NSObject {
             options.fetchLimit = limit!
         }
 
-        let result = PHAsset.fetchAssets(with: options)
+        var collection:PHAssetCollection? = nil
+        if (collectionType != nil && collectionSubType != nil) {
+            PHAssetCollectionSubtype.smartAlbumVideos
+            collection = PHAssetCollection.fetchAssetCollections(with: PHAssetCollectionType(rawValue: collectionType!)!, subtype: PHAssetCollectionSubtype(rawValue: collectionSubType!)!, options: nil).firstObject
+        }
+        
+        let result = collection == nil
+            ? PHAsset.fetchAssets(with: options)
+            : PHAsset.fetchAssets(in: collection!, options: options)
+
         if (totalOnly == true) {
             resolve(["total": result.count])
             return
@@ -68,7 +79,6 @@ class Cameraroll: NSObject {
             "mediaType": select?.contains("mediaType") ?? false,
             "size": select?.contains("size") ?? false,
             "creationDate": select?.contains("creationDate") ?? false,
-            "uri": select?.contains("uri") ?? false,
             "isFavorite": select?.contains("isFavorite") ?? false
         ]
         
@@ -87,7 +97,6 @@ class Cameraroll: NSObject {
             if (includes["size"]!) { dict["size"] = size ?? -1 }
             if (includes["creationDate"]!) { dict["creationDate"] = creationDate?.timeIntervalSince1970 ?? -1 }
             if (includes["isFavorite"]!) { dict["isFavorite"] = asset.isFavorite }
-            if (includes["uri"]!) { dict["uri"] = "ph://\(asset.localIdentifier)" }
             
             return dict
         })
