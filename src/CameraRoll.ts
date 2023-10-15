@@ -95,19 +95,24 @@ export class CameraRoll {
    * Find blurry images
    */
   static async findBlurryImages({
-    previousIds = [],
+    ignoreIds = [],
     threshold = 5,
     itemsPerPage = 500,
+    onFinished,
   }: {
-    previousIds?: string[];
+    ignoreIds?: string[];
     threshold?: number;
     itemsPerPage?: number;
+    onFinished?: (processedIds: string[]) => void;
   } = {}): Promise<GalleryAsset[]> {
-    const items = await RNSimilarImageDetector.findBlurryImagesFromGallery(
-      previousIds,
-      threshold,
-      itemsPerPage,
-    );
+    const { items, processedIds } =
+      await RNSimilarImageDetector.findBlurryImagesFromGallery(
+        ignoreIds,
+        threshold,
+        itemsPerPage,
+      );
+
+    onFinished?.(processedIds);
 
     return items.map(buildResultAsset);
   }

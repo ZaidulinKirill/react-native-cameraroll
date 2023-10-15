@@ -154,7 +154,7 @@ public class BlurryImageDetector: NSObject {
   }
 
   public func fetchImagesFromGallery(
-    previousIds: [String], threshold: Double, itemsPerPage: Int, onFinished: @escaping ([PHAsset]) -> Void
+    previousIds: [String], threshold: Double, itemsPerPage: Int, onFinished: @escaping ([PHAsset], [String]) -> Void
   ) {
     PHPhotoLibrary.requestAuthorization { (status) in
       switch status {
@@ -167,10 +167,12 @@ public class BlurryImageDetector: NSObject {
         let assets: PHFetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         let count: Int = assets.count < itemsPerPage ? assets.count : itemsPerPage
         var results = [PHAsset]()
+        var processedIds = [String]()
 
         for i in 0..<count {
           autoreleasepool {
             let asset = assets[i]
+            processedIds.append(asset.localIdentifier)
 
             let result = self.getAssetThumbnail(asset: asset)
             if let assetImage = result {
@@ -183,7 +185,7 @@ public class BlurryImageDetector: NSObject {
           }
         }
 
-        onFinished(results)
+        onFinished(results, processedIds)
       case .denied, .restricted:
         print("Not allowed")
       case .notDetermined:
@@ -206,8 +208,13 @@ public class BlurryImageDetector: NSObject {
       threshold: threshold,
       itemsPerPage: itemsPerPage,
       onFinished: {
-        (assets: [PHAsset]) in
-          resolve(self.preprocessAssets(assets: assets) as NSArray)
+        (assets: [PHAsset], processedIds: [String]) in
+          let items = self.preprocessAssets(assets: assets) as NSArray
+          
+          resolve([
+            items: items,
+            "processedIds": processedIds,
+        ])
       })
   }
 }
