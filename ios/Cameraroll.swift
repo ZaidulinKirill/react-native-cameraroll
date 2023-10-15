@@ -1,10 +1,13 @@
 import Photos
 
-
 @objc(Cameraroll)
-class Cameraroll: NSObject {
+public class Cameraroll: NSObject {
+    @objc static func requiresMainQueueSetup() -> Bool {
+        return false
+    }
+
     @objc(getAssets:withResolver:withRejecter:)
-    func getAssets(params: [String: Any], resolve: RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    func getAssets(params: [String: Any], resolve: RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
         }
@@ -19,56 +22,56 @@ class Cameraroll: NSObject {
         let totalOnly = params["totalOnly"] as? Bool
 
         let options = PHFetchOptions()
-        options.sortDescriptors = sortBy?.map({ sortDict in
+        options.sortDescriptors = sortBy?.map { sortDict in
             NSSortDescriptor(key: sortDict["key"] as? String, ascending: sortDict["asc"] as! Bool)
-        })
+        }
 
         var predicates = [NSPredicate]()
-        if (mediaType == "image") {
-            predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.image.rawValue))
+        if mediaType == "image" {
+            predicates.append(NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue))
         }
-        
-        if (mediaType == "video") {
-            predicates.append(NSPredicate(format: "mediaType == %d",  PHAssetMediaType.video.rawValue))
+
+        if mediaType == "video" {
+            predicates.append(NSPredicate(format: "mediaType == %d", PHAssetMediaType.video.rawValue))
         }
-        
-        if (predicates.count > 0) {
+
+        if predicates.count > 0 {
             options.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
 
-        if (skip == nil && limit != nil && totalOnly != true) {
+        if skip == nil && limit != nil && totalOnly != true {
             options.fetchLimit = limit!
         }
 
-        var collection:PHAssetCollection? = nil
-        if (collectionType != nil && collectionSubType != nil) {
+        var collection: PHAssetCollection? = nil
+        if collectionType != nil && collectionSubType != nil {
             PHAssetCollectionSubtype.smartAlbumVideos
             collection = PHAssetCollection.fetchAssetCollections(with: PHAssetCollectionType(rawValue: collectionType!)!, subtype: PHAssetCollectionSubtype(rawValue: collectionSubType!)!, options: nil).firstObject
         }
-        
+
         let result = collection == nil
             ? PHAsset.fetchAssets(with: options)
             : PHAsset.fetchAssets(in: collection!, options: options)
 
-        if (totalOnly == true) {
+        if totalOnly == true {
             resolve(["total": result.count])
             return
         }
 
         var assets = [PHAsset]()
-        
-        if (skip != nil) {
-            let from = skip!
-            let to = min((from) + (limit ?? result.count), result.count) - 1
 
-            if (from < result.count) {
-                let indexes = Array(from...to)
-                result.enumerateObjects(at: IndexSet(indexes)) { (asset, _, _) in
+        if skip != nil {
+            let from = skip!
+            let to = min(from + (limit ?? result.count), result.count) - 1
+
+            if from < result.count {
+                let indexes = Array(from ... to)
+                result.enumerateObjects(at: IndexSet(indexes)) { asset, _, _ in
                     assets.append(asset)
                 }
             }
         } else {
-            result.enumerateObjects { (asset, _, _) in
+            result.enumerateObjects { asset, _, _ in
                 assets.append(asset)
             }
         }
@@ -79,45 +82,44 @@ class Cameraroll: NSObject {
             "mediaType": select?.contains("mediaType") ?? false,
             "size": select?.contains("size") ?? false,
             "creationDate": select?.contains("creationDate") ?? false,
-            "isFavorite": select?.contains("isFavorite") ?? false
+            "isFavorite": select?.contains("isFavorite") ?? false,
         ]
-        
-        let items = assets.map({ asset in
+
+        let items = assets.map { asset in
             let resources = PHAssetResource.assetResources(for: asset)
             let resource = resources.first
-            let size = resource?.value(forKey: "fileSize") as? CLong
+            let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
             let originalFilename = resource?.originalFilename
-            let filename = asset.value(forKey: "filename") as? NSString
             let creationDate = asset.creationDate
-            
-            var dict = [String: Any]()
-            if (includes["id"]!) { dict["id"] = asset.localIdentifier }
-            if (includes["name"]!) { dict["name"] = originalFilename ?? "" }
-            if (includes["mediaType"]!) { dict["mediaType"] = asset.mediaType.rawValue }
-            if (includes["size"]!) { dict["size"] = size ?? -1 }
-            if (includes["creationDate"]!) { dict["creationDate"] = creationDate?.timeIntervalSince1970 ?? -1 }
-            if (includes["isFavorite"]!) { dict["isFavorite"] = asset.isFavorite }
-            
-            return dict
-        })
 
-        resolve([ "items": items ])
+            var dict = [String: Any]()
+            if includes["id"]! { dict["id"] = asset.localIdentifier }
+            if includes["name"]! { dict["name"] = originalFilename ?? "" }
+            if includes["mediaType"]! { dict["mediaType"] = asset.mediaType.rawValue }
+            if includes["size"]! { dict["size"] = size }
+            if includes["creationDate"]! { dict["creationDate"] = creationDate?.timeIntervalSince1970 ?? -1 }
+            if includes["isFavorite"]! { dict["isFavorite"] = asset.isFavorite }
+
+            return dict
+        }
+
+        resolve(["items": items])
     }
-    
+
     @objc(editIsFavorite:withValue:withResolver:withRejecter:)
-    func editIsFavorite(id: String, value: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    func editIsFavorite(id: String, value: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
         }
 
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
         guard let asset = fetchResult.firstObject else {
-            reject("Not found", "Asset not found", nil);
+            reject("Not found", "Asset not found", nil)
             return
         }
-        
+
         let isFavorite = value
-                
+
         PHPhotoLibrary.shared().performChanges({
             let request = PHAssetChangeRequest(for: asset)
             request.isFavorite = isFavorite
@@ -129,29 +131,74 @@ class Cameraroll: NSObject {
             }
         })
     }
-    
+
     @objc(deleteAssets:withResolver:withRejecter:)
-    func deleteAssets(ids: [String], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    func deleteAssets(ids: [String], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         guard checkPhotoLibraryAccess(reject: reject) else {
             return
         }
 
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil)
-        if (fetchResult.count == 0) {
+        if fetchResult.count == 0 {
             resolve(["success": true])
             return
         }
-        
+
         var assets = [PHAsset]()
-        fetchResult.enumerateObjects { (asset, _, _) in
+        fetchResult.enumerateObjects { asset, _, _ in
             assets.append(asset)
         }
-        
+
         PHPhotoLibrary.shared().performChanges({
             PHAssetChangeRequest.deleteAssets(assets as NSFastEnumeration)
-        }, completionHandler: { (success, error) in
+        }, completionHandler: { success, _ in
             resolve(["success": success])
         })
+    }
+
+    @objc(getAssetVideoInfo:withResolver:withRejecter:)
+    func getAssetVideoInfo(id: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter _: RCTPromiseRejectBlock) {
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
+
+        if fetchResult.count > 0 {
+            let asset = fetchResult.firstObject
+
+            let options = PHVideoRequestOptions()
+            options.version = .original
+
+            PHImageManager.default().requestAVAsset(forVideo: asset!, options: options) { avAsset, _, _ in
+                guard let avAsset = avAsset as? AVURLAsset else {
+                    resolve(nil)
+                    return
+                }
+
+                let urlAsset = avAsset.url
+
+                do {
+                    let videoData = try Data(contentsOf: urlAsset)
+                    let videoAsset = AVAsset(url: urlAsset)
+
+                    if let videoTrack = videoAsset.tracks(withMediaType: .video).first {
+                        let videoBitrate = videoTrack.estimatedDataRate
+                        let videoWidth = videoTrack.naturalSize.width
+                        let videoHeight = videoTrack.naturalSize.height
+
+                        resolve([
+                            "bitrate": videoBitrate,
+                            "width": videoWidth,
+                            "height": videoHeight,
+                        ] as [String: Any]
+                        )
+                    } else {
+                        resolve(nil)
+                    }
+                } catch {
+                    resolve(nil)
+                }
+            }
+        } else {
+            resolve(nil)
+        }
     }
 
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {
@@ -159,12 +206,12 @@ class Cameraroll: NSObject {
         if #available(iOS 14, *) {
             statuses.append(.limited)
         }
-        
+
         let status = PHPhotoLibrary.authorizationStatus()
         let isAllowed = statuses.contains(status)
-        
-        if (!isAllowed && reject != nil) {
-            reject!("Permission denied", "Photos access permission required", nil);
+
+        if !isAllowed && reject != nil {
+            reject!("Permission denied", "Photos access permission required", nil)
         }
 
         return isAllowed

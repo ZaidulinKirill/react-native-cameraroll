@@ -6,8 +6,9 @@
  */
 import { Platform } from 'react-native';
 
-import { RNCameraroll } from './CameraRollNative';
-import type { GetAssetsParams, GetAssetsResult } from './types';
+import { RNCameraroll, RNSimilarImageDetector } from './CameraRollNative';
+import type { GalleryAsset, GetAssetsParams, VideoInfo } from './types';
+import { buildResultAsset } from './utils/buildResultAsset';
 
 /**
  * `CameraRoll` provides access to the local camera roll or photo library.
@@ -16,8 +17,8 @@ export class CameraRoll {
   /**
    * Fetch assets from your local gallery
    */
-  static async getAssets(params: GetAssetsParams): Promise<GetAssetsResult> {
-    const result = await RNCameraroll.getAssets(
+  static async getAssets(params: GetAssetsParams): Promise<GalleryAsset[]> {
+    const items = await RNCameraroll.getAssets(
       Platform.select({
         ios: {
           ...params,
@@ -76,64 +77,41 @@ export class CameraRoll {
       }),
     );
 
-    return {
-      ...result,
-      items: result.items.map((item: any) => {
-        if (Platform.OS === 'ios') {
-          return {
-            ...(params?.select?.includes('id') && item.id && { id: item.id }),
-            ...(params?.select?.includes('uri') &&
-              item.id && { uri: `ph://${item.id}` }),
-            ...(params?.select?.includes('name') &&
-              item.name && { name: item.name }),
-            ...(params?.select?.includes('mediaType') &&
-              (item.mediaType || item.mediaType === 0) && {
-                type:
-                  item.mediaType === 1
-                    ? 'image'
-                    : item.mediaType === 2
-                    ? 'video'
-                    : 'unknown',
-              }),
-            ...(params?.select?.includes('size') &&
-              (item.size || item.size === 0) && { size: item.size }),
-            ...(params?.select?.includes('creationDate') &&
-              item.creationDate !== -1 && {
-                creationDate: new Date(item.creationDate * 1000),
-              }),
-            ...(params?.select?.includes('uri') && {
-              uri: item.uri,
-            }),
-            ...(params?.select?.includes('isFavorite') && {
-              isFavorite: item.isFavorite,
-            }),
-          };
-        }
+    return items.map(buildResultAsset);
+  }
 
-        if (Platform.OS === 'android') {
-          return {
-            ...(item.id && { id: item.id }),
-            ...(item.name && { name: item.name }),
-            ...(item.uri && { uri: item.uri }),
-            ...(item.size && { size: item.size }),
-            ...(item.isFavorite && { isFavorite: item.isFavorite === '1' }),
-            ...(item.mediaType && {
-              mediaType:
-                item.mediaType === 1
-                  ? 'image'
-                  : item.mediaType === 3
-                  ? 'video'
-                  : 'unknown',
-            }),
-            ...(item.creationDate && {
-              creationDate: new Date(parseInt(item.creationDate, 10) * 1000),
-            }),
-          };
-        }
+  /**
+   * Find similar images
+   */
+  static async findSimilarImages(interval = 15): Promise<GalleryAsset[][]> {
+    const groups = await RNSimilarImageDetector.findSimilarImagesFromGallery(
+      interval,
+    );
 
-        throw new Error('Not implemented');
-      }),
-    };
+    return groups.map((items: any[]) => items.map(buildResultAsset));
+  }
+
+  /**
+   * Find blurry images
+   */
+  static async findBlurryImages(
+    {
+      previousIds = [],
+      threshold = 5,
+    }: {
+      previousIds?: string[];
+      threshold?: number;
+    } = {
+      previousIds: [],
+      threshold: 5,
+    },
+  ): Promise<GalleryAsset[]> {
+    const items = await RNSimilarImageDetector.findBlurryImagesFromGallery(
+      previousIds,
+      threshold,
+    );
+
+    return items.map(buildResultAsset);
   }
 
   /**
@@ -162,5 +140,12 @@ export class CameraRoll {
    */
   static deleteAssets(ids: string[]): Promise<{ success: boolean }> {
     return RNCameraroll.deleteAssets(ids);
+  }
+
+  /**
+   * Get video asset details
+   */
+  static async getAssetVideoInfo(id: string): Promise<VideoInfo | null> {
+    return RNCameraroll.getAssetVideoInfo(id);
   }
 }

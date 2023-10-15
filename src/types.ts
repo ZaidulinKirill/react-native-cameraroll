@@ -53,20 +53,21 @@ export type GetAssetsParams = {
   select?: SelectKey[];
 };
 
+export type GalleryAsset = {
+  id?: string;
+  name?: string;
+  mediaType?: 'unknown' | 'video' | 'image';
+  size?: number;
+  creationDate?: Date;
+  uri?: string;
+  isFavorite?: boolean;
+};
+
 /**
- * Result of getAssets method
+ * Video asset details
  */
-export type GetAssetsResult = {
-  /**
-   * Number of photos/videos you want to skip
-   */
-  items: {
-    id?: string;
-    name?: string;
-    mediaType?: 'unknown' | 'video' | 'image';
-    size?: number;
-    creationDate?: Date;
-    uri?: string;
-    isFavorite?: boolean;
-  }[];
+export type VideoInfo = {
+  bitrate: number;
+  width: number;
+  height: number;
 };

@@ -16,3 +16,25 @@ export const RNCameraroll = NativeModules.Cameraroll
         },
       },
     );
+
+export const RNSimilarImageDetector = NativeModules.SimilarImageDetector
+  ? NativeModules.SimilarImageDetector
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      },
+    );
+
+export const RNBlurryImageDetector = NativeModules.BlurryImageDetector
+  ? NativeModules.BlurryImageDetector
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      },
+    );
