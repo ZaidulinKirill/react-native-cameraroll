@@ -62,7 +62,7 @@ public class SimilarImageDetector: NSObject {
     }
 
     @objc(findSimilarImagesFromGallery:withResolver:withRejecter:)
-    func findSimilarImagesFromGallery(interval: Double, resolve: RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    func findSimilarImagesFromGallery(interval: Double, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         fetchImagesFromGallery(resultHandler: {
             (results: [PHAsset]) in
             if results.count == 0 {

@@ -18,6 +18,11 @@ export type SelectKey =
  */
 export type GetAssetsParams = {
   /**
+   * Assets local identifiers to filter
+   */
+  ids?: string[];
+
+  /**
    * Media type
    */
   mediaType?: 'image' | 'video' | 'all';

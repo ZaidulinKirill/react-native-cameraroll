@@ -19,6 +19,7 @@ public class Cameraroll: NSObject {
         let mediaType = params["mediaType"] as? String
         let collectionType = params["collectionType"] as? Int
         let collectionSubType = params["collectionSubType"] as? Int
+        let ids = params["ids"] as? [String]
         let totalOnly = params["totalOnly"] as? Bool
 
         let options = PHFetchOptions()
@@ -34,7 +35,11 @@ public class Cameraroll: NSObject {
         if mediaType == "video" {
             predicates.append(NSPredicate(format: "mediaType == %d", PHAssetMediaType.video.rawValue))
         }
-
+        
+        if ids != nil {
+            predicates.append(NSPredicate(format: "localIdentifier IN %@", ids!))
+        }
+        
         if predicates.count > 0 {
             options.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
