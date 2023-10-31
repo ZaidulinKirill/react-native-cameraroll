@@ -140,12 +140,12 @@ public class BlurryImageDetector: NSObject {
             let resource = resources.first
             let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
             let originalFilename = resource?.originalFilename
-            let creationDate = asset.creationDate
+            let createdAt = asset.creationDate
 
             resuls.append([
                 "id": asset.localIdentifier,
                 "name": originalFilename ?? "",
-                "creationDate": creationDate?.timeIntervalSince1970 ?? -1,
+                "createdAt": createdAt?.timeIntervalSince1970 ?? -1,
                 "size": size,
             ])
         }

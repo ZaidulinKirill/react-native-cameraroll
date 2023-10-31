@@ -62,7 +62,7 @@ export class CameraRoll {
           ...params,
           sortBy: params.sortBy?.map((x) => {
             const key = (() => {
-              if (x.key === 'creationDate') {
+              if (x.key === 'createdAt') {
                 return 'date_added';
               } else if (x.key === 'modificationDate') {
                 return 'date_modified';

@@ -86,7 +86,7 @@ public class Cameraroll: NSObject {
             "name": select?.contains("name") ?? false,
             "mediaType": select?.contains("mediaType") ?? false,
             "size": select?.contains("size") ?? false,
-            "creationDate": select?.contains("creationDate") ?? false,
+            "createdAt": select?.contains("createdAt") ?? false,
             "isFavorite": select?.contains("isFavorite") ?? false,
         ]
 
@@ -95,14 +95,14 @@ public class Cameraroll: NSObject {
             let resource = resources.first
             let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
             let originalFilename = resource?.originalFilename
-            let creationDate = asset.creationDate
+            let createdAt = asset.creationDate
 
             var dict = [String: Any]()
             if includes["id"]! { dict["id"] = asset.localIdentifier }
             if includes["name"]! { dict["name"] = originalFilename ?? "" }
             if includes["mediaType"]! { dict["mediaType"] = asset.mediaType.rawValue }
             if includes["size"]! { dict["size"] = size }
-            if includes["creationDate"]! { dict["creationDate"] = creationDate?.timeIntervalSince1970 ?? -1 }
+            if includes["createdAt"]! { dict["createdAt"] = createdAt?.timeIntervalSince1970 ?? -1 }
             if includes["isFavorite"]! { dict["isFavorite"] = asset.isFavorite }
 
             return dict

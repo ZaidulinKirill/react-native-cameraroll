@@ -44,7 +44,7 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
       "name" to (select?.contains("uri") ?: false),
       "size" to (select?.contains("size") ?: false),
       "isFavorite" to (select?.contains("isFavorite") ?: false),
-      "creationDate" to (select?.contains("creationDate") ?: false),
+      "createdAt" to (select?.contains("createdAt") ?: false),
       "mediaType" to (select?.contains("mediaType") ?: false),
     )
 
@@ -131,9 +131,9 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
           }
         }
 
-        if (includes["creationDate"] == true) {
-          val creationDate = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED))
-          dict.putString("creationDate", creationDate)
+        if (includes["createdAt"] == true) {
+          val createdAt = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED))
+          dict.putString("createdAt", createdAt)
         }
 
         if (includes["mediaType"] == true) {
@@ -199,7 +199,7 @@ class CamerarollModule(reactContext: ReactApplicationContext) :
       if ("name" in includes) MediaStore.Files.FileColumns.DISPLAY_NAME else null,
       if ("size" in includes) MediaStore.Files.FileColumns.SIZE else null,
       if ("isFavorite" in includes && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) MediaStore.Files.FileColumns.IS_FAVORITE else null,
-      if ("creationDate" in includes) MediaStore.Files.FileColumns.DATE_ADDED else null,
+      if ("createdAt" in includes) MediaStore.Files.FileColumns.DATE_ADDED else null,
       if ("mediaType" in includes || "uri" in includes || (mediaType != "image" && mediaType != "video")) MediaStore.Files.FileColumns.MEDIA_TYPE else null,
     ).filterNotNull()
   }

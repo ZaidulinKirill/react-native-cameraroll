@@ -1,5 +1,5 @@
 export type SortByKey =
-  | 'creationDate'
+  | 'createdAt'
   | 'modificationDate'
   | 'mediaType'
   | 'fileSize';
@@ -9,7 +9,7 @@ export type SelectKey =
   | 'name'
   | 'mediaType'
   | 'size'
-  | 'creationDate'
+  | 'createdAt'
   | 'uri'
   | 'isFavorite';
 
@@ -59,11 +59,11 @@ export type GetAssetsParams = {
 };
 
 export type GalleryAsset = {
-  id?: string;
+  id: string;
   name?: string;
   mediaType?: 'unknown' | 'video' | 'image';
   size?: number;
-  creationDate?: Date;
+  createdAt?: string;
   uri?: string;
   isFavorite?: boolean;
 };

@@ -48,12 +48,12 @@ public class SimilarImageDetector: NSObject {
             let resource = resources.first
             let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
             let originalFilename = resource?.originalFilename
-            let creationDate = asset.creationDate
+            let createdAt = asset.creationDate
 
             resuls.append([
                 "id": asset.localIdentifier,
                 "name": originalFilename ?? "",
-                "creationDate": creationDate?.timeIntervalSince1970 ?? -1,
+                "createdAt": createdAt?.timeIntervalSince1970 ?? -1,
                 "size": size,
             ])
         }
@@ -78,8 +78,8 @@ public class SimilarImageDetector: NSObject {
 
             for i in 1 ..< sortedAssets.count {
                 let asset = sortedAssets[i]
-                let creationDate = (asset.creationDate?.timeIntervalSince1970 ?? 0)
-                let timeOffset = currentGroupTime - creationDate
+                let createdAt = (asset.creationDate?.timeIntervalSince1970 ?? 0)
+                let timeOffset = currentGroupTime - createdAt
 
                 if timeOffset < interval {
                     currentGroup.append(asset)
@@ -91,7 +91,7 @@ public class SimilarImageDetector: NSObject {
                     currentGroup = [asset]
                 }
 
-                currentGroupTime = creationDate
+                currentGroupTime = createdAt
             }
 
             if currentGroup.count > 1 {

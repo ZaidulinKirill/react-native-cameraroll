@@ -15,9 +15,11 @@ export function buildResultAsset(item: any) {
             : 'unknown',
       }),
       ...(item.size != null && { size: item.size }),
-      ...(item.creationDate != null && {
-        creationDate:
-          item.creationDate === -1 ? null : new Date(item.creationDate * 1000),
+      ...(item.createdAt != null && {
+        createdAt:
+          item.createdAt === -1
+            ? null
+            : new Date(item.createdAt * 1000).toISOString(),
       }),
       ...(item.isFavorite != null && {
         isFavorite: item.isFavorite,
@@ -40,8 +42,8 @@ export function buildResultAsset(item: any) {
             ? 'video'
             : 'unknown',
       }),
-      ...(item.creationDate != null && {
-        creationDate: new Date(parseInt(item.creationDate, 10) * 1000),
+      ...(item.createdAt != null && {
+        createdAt: new Date(parseInt(item.createdAt, 10) * 1000).toISOString(),
       }),
     };
   }
