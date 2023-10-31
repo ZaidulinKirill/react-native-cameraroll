@@ -5,6 +5,7 @@
 
 RCT_EXTERN_METHOD(findBlurryImagesFromGallery:(NSArray *)previousIds
                   withThreshold:(double)threshold
+                  withItemsPerPage:(int)itemsPerPage
                   withResolver:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject
 )
