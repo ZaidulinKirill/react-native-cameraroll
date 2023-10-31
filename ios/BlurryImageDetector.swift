@@ -160,7 +160,11 @@ public class BlurryImageDetector: NSObject {
       switch status {
       case .authorized:
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "NOT (localIdentifier IN %@)", argumentArray: previousIds)
+
+        if (previousIds.count > 0) {
+            fetchOptions.predicate = NSPredicate(format: "NOT (localIdentifier IN %@)", previousIds)
+        }
+
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         fetchOptions.includeAssetSourceTypes = [.typeUserLibrary]
 
@@ -212,7 +216,7 @@ public class BlurryImageDetector: NSObject {
           let items = self.preprocessAssets(assets: assets) as NSArray
           
           resolve([
-            items: items,
+            "items": items,
             "processedIds": processedIds,
         ])
       })

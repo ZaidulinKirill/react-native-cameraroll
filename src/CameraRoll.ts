@@ -6,7 +6,11 @@
  */
 import { Platform } from 'react-native';
 
-import { RNCameraroll, RNSimilarImageDetector } from './CameraRollNative';
+import {
+  RNCameraroll,
+  RNSimilarImageDetector,
+  RNBlurryImageDetector,
+} from './CameraRollNative';
 import type { GalleryAsset, GetAssetsParams, VideoInfo } from './types';
 import { buildResultAsset } from './utils/buildResultAsset';
 
@@ -18,7 +22,7 @@ export class CameraRoll {
    * Fetch assets from your local gallery
    */
   static async getAssets(params: GetAssetsParams): Promise<GalleryAsset[]> {
-    const items = await RNCameraroll.getAssets(
+    const { items } = await RNCameraroll.getAssets(
       Platform.select({
         ios: {
           ...params,
@@ -106,7 +110,7 @@ export class CameraRoll {
     onFinished?: (processedIds: string[]) => void;
   } = {}): Promise<GalleryAsset[]> {
     const { items, processedIds } =
-      await RNSimilarImageDetector.findBlurryImagesFromGallery(
+      await RNBlurryImageDetector.findBlurryImagesFromGallery(
         ignoreIds,
         threshold,
         itemsPerPage,
