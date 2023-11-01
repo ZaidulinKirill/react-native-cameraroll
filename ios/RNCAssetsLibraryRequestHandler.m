@@ -122,34 +122,86 @@ RCT_EXPORT_MODULE()
     // By default, allow downloading images from iCloud
     PHImageRequestOptions *const requestOptions = [PHImageRequestOptions new];
     requestOptions.networkAccessAllowed = YES;
+    
+    int width  = 0;
+    int height = 0;
 
-    [[PHImageManager defaultManager] requestImageDataForAsset:asset
-                                                      options:requestOptions
-                                                resultHandler:^(NSData * _Nullable imageData,
-                                                                NSString * _Nullable dataUTI,
-                                                                UIImageOrientation orientation,
-                                                                NSDictionary * _Nullable info) {
-      NSError *const error = [info objectForKey:PHImageErrorKey];
-      if (error) {
-        [delegate URLRequest:cancellationBlock didCompleteWithError:error];
-        return;
-      }
+    // Extract the value of "width"
+    if ([requestURL.absoluteString rangeOfString:@"width"].location != NSNotFound) {
+        NSRange widthRange = [requestURL.absoluteString rangeOfString:@"width="];
+        NSString *widthString = [requestURL.absoluteString substringWithRange:NSMakeRange(widthRange.location + widthRange.length, 3)];
+        width = [widthString integerValue];
+    }
 
-      NSInteger const length = [imageData length];
-      CFStringRef const dataUTIStringRef = (__bridge CFStringRef _Nonnull)(dataUTI);
-      CFStringRef const mimeType = UTTypeCopyPreferredTagWithClass(dataUTIStringRef, kUTTagClassMIMEType);
+      // Extract the value of "height"
+    if ([requestURL.absoluteString rangeOfString:@"height"].location != NSNotFound) {
+        NSRange heightRange = [requestURL.absoluteString rangeOfString:@"height="];
+        NSString *heightString = [requestURL.absoluteString substringWithRange:NSMakeRange(heightRange.location + heightRange.length, 3)];
+        height = [heightString integerValue];
+    }
 
-      NSURLResponse *const response = [[NSURLResponse alloc] initWithURL:request.URL
-                                                                MIMEType:(__bridge NSString *)(mimeType)
-                                                   expectedContentLength:length
-                                                        textEncodingName:nil];
-      if (mimeType) CFRelease(mimeType);
+    if (width != 0 && height != 0) {
+        requestOptions.version = PHImageRequestOptionsVersionUnadjusted;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
 
-      [delegate URLRequest:cancellationBlock didReceiveResponse:response];
+        CGSize const thumbnailSize = CGSizeMake(width, height);
 
-      [delegate URLRequest:cancellationBlock didReceiveData:imageData];
-      [delegate URLRequest:cancellationBlock didCompleteWithError:nil];
-    }];
+        [[PHImageManager defaultManager] requestImageForAsset:asset targetSize:thumbnailSize contentMode:PHImageContentModeAspectFill options:requestOptions resultHandler:^(UIImage * _Nullable image, NSDictionary * _Nullable info) {
+            
+            NSError *const error = [info objectForKey:PHImageErrorKey];
+            if (error) {
+                [delegate URLRequest:cancellationBlock didCompleteWithError:error];
+                return;
+            }
+            
+            NSData *imageData = UIImageJPEGRepresentation(image, 1);
+            NSString * _Nullable dataUTI = @"public.jpeg";
+            
+            NSInteger const length = [imageData length];
+            CFStringRef const dataUTIStringRef = (__bridge CFStringRef _Nonnull)(dataUTI);
+            CFStringRef const mimeType = UTTypeCopyPreferredTagWithClass(dataUTIStringRef, kUTTagClassMIMEType);
+
+            
+            NSURLResponse *const response = [[NSURLResponse alloc] initWithURL:request.URL
+                                                                      MIMEType:(__bridge NSString *)(mimeType)
+                                                          expectedContentLength:length
+                                                              textEncodingName:nil];
+            if (mimeType) CFRelease(mimeType);
+
+            [delegate URLRequest:cancellationBlock didReceiveResponse:response];
+
+            [delegate URLRequest:cancellationBlock didReceiveData:imageData];
+            [delegate URLRequest:cancellationBlock didCompleteWithError:nil];
+        }];
+    } else {
+        [[PHImageManager defaultManager] requestImageDataForAsset:asset
+                                                          options:requestOptions
+                                                    resultHandler:^(NSData * _Nullable imageData,
+                                                                    NSString * _Nullable dataUTI,
+                                                                    UIImageOrientation orientation,
+                                                                    NSDictionary * _Nullable info) {
+          NSError *const error = [info objectForKey:PHImageErrorKey];
+          if (error) {
+            [delegate URLRequest:cancellationBlock didCompleteWithError:error];
+            return;
+          }
+
+          NSInteger const length = [imageData length];
+          CFStringRef const dataUTIStringRef = (__bridge CFStringRef _Nonnull)(dataUTI);
+          CFStringRef const mimeType = UTTypeCopyPreferredTagWithClass(dataUTIStringRef, kUTTagClassMIMEType);
+
+          NSURLResponse *const response = [[NSURLResponse alloc] initWithURL:request.URL
+                                                                    MIMEType:(__bridge NSString *)(mimeType)
+                                                      expectedContentLength:length
+                                                            textEncodingName:nil];
+          if (mimeType) CFRelease(mimeType);
+
+          [delegate URLRequest:cancellationBlock didReceiveResponse:response];
+
+          [delegate URLRequest:cancellationBlock didReceiveData:imageData];
+          [delegate URLRequest:cancellationBlock didCompleteWithError:nil];
+        }];
+    }
   }
   
   return cancellationBlock;
