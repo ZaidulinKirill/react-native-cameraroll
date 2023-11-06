@@ -1,6 +1,6 @@
 {
   "name": "@kirz/react-native-gallery",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "description": "React Native Gallery",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
