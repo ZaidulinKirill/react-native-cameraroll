@@ -251,13 +251,18 @@ public class Cameraroll: NSObject {
         }
 
         for uri in files {
-            if let url = URL(string: uri) {
-                if let data = try? Data(contentsOf: url) {
-                    if let image = UIImage(data: data) {
-                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                    } else {
-                        UISaveVideoAtPathToSavedPhotosAlbum(url.path, nil, nil, nil)
-                    }
+            let url: URL
+            if uri.contains("://") {
+                url = URL(string: uri)!;
+            } else {
+                url = URL(fileURLWithPath: uri)
+            }
+
+            if let data = try? Data(contentsOf: url) {
+                if let image = UIImage(data: data) {
+                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                } else {
+                    UISaveVideoAtPathToSavedPhotosAlbum(url.path, nil, nil, nil)
                 }
             }
         }
