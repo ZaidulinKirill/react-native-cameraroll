@@ -155,4 +155,11 @@ export class CameraRoll {
   static async getAssetVideoInfo(id: string): Promise<VideoInfo | null> {
     return RNCameraroll.getAssetVideoInfo(id);
   }
+
+  /**
+   * Save assets to Camera Roll
+   */
+  static saveAssets(files: string[]) {
+    return RNCameraroll.saveAssets(files);
+  }
 }
