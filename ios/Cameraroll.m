@@ -25,6 +25,14 @@ RCT_EXTERN_METHOD(saveAssets:(NSArray *) files
                   withRejecter:(RCTPromiseRejectBlock)reject
 )
 
+RCT_EXTERN_METHOD(saveThumbnail:(NSString *)id
+                  withFilename: (NSString *)filename
+                  withWidth: (int)width
+                  withHeight: (int)height
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
 + (BOOL)requiresMainQueueSetup
 {
   return NO;

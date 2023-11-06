@@ -206,6 +206,61 @@ public class Cameraroll: NSObject {
         }
     }
 
+    @objc(saveThumbnail:withFilename:withResolver:withRejecter:)
+    func saveThumbnail(id: String, filename: String, width: Int, height: Int, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter _: RCTPromiseRejectBlock) {
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
+
+        // let manager = PHImageManager.default()
+        // let option = PHImageRequestOptions()
+        // var thumbnail = UIImage()
+        // option.networkAccessAllowed = true
+        // manager.requestImage(for: asset, targetSize: CGSize(width: width, height: height), contentMode: .aspectFill, options: option, resultHandler: {(result, info)->Void in
+        //     thumbnail = result!
+        // })
+        // cell.imageView.image = thumbnail
+
+
+        if fetchResult.count > 0 {
+            let asset = fetchResult.firstObject
+
+            let options = PHImageRequestOptions()
+            options.isNetworkAccessAllowed = true
+
+            PHImageManager.default().requestImage(for: asset!, targetSize: CGSize(width: width, height: height), contentMode: .aspectFill, options: options) { result, _, _ in
+                guard let avAsset = avAsset as? AVURLAsset else {
+                    resolve(nil)
+                    return
+                }
+
+                let urlAsset = avAsset.url
+
+                do {
+                    let videoData = try Data(contentsOf: urlAsset)
+                    let videoAsset = AVAsset(url: urlAsset)
+
+                    if let videoTrack = videoAsset.tracks(withMediaType: .video).first {
+                        let videoBitrate = videoTrack.estimatedDataRate
+                        let videoWidth = videoTrack.naturalSize.width
+                        let videoHeight = videoTrack.naturalSize.height
+
+                        resolve([
+                            "bitrate": videoBitrate,
+                            "width": videoWidth,
+                            "height": videoHeight,
+                        ] as [String: Any]
+                        )
+                    } else {
+                        resolve(nil)
+                    }
+                } catch {
+                    resolve(nil)
+                }
+            }
+        } else {
+            reject("Error", "Asset not found", nil)
+        }
+    }
+
     @objc(saveAssets:withResolver:withRejecter:)
     func saveAssets(files: [String], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         guard checkPhotoLibraryAccess(reject: reject) else {
@@ -225,6 +280,35 @@ public class Cameraroll: NSObject {
         }
         
         resolve(nil)
+    }
+
+    @objc(saveThumbnail:withFilename:withWidth:withHeight:withResolver:withRejecter:)
+    func saveThumbnail(id: String, filename: String, width: Int, height: Int, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
+
+
+        if fetchResult.count > 0 {
+            let asset = fetchResult.firstObject
+
+            let options = PHImageRequestOptions()
+            options.isNetworkAccessAllowed = true
+
+            PHImageManager.default().requestImage(for: asset!, targetSize: CGSize(width: width, height: height), contentMode: .aspectFill, options: options) { image, error in
+                if (image == nil) {
+                    reject("Error", "Unexpected error", nil)
+                    return
+                }
+
+                if let data = image!.jpegData(compressionQuality: 1) {
+                    try? data.write(to: URL(string: filename)!)
+                    resolve(nil)
+                } else {
+                    reject("Error", "Unexpected error", nil)
+                }
+            }
+        } else {
+            reject("Error", "Asset not found", nil)
+        }
     }
 
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {

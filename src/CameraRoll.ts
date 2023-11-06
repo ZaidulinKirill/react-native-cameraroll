@@ -162,4 +162,16 @@ export class CameraRoll {
   static saveAssets(files: string[]) {
     return RNCameraroll.saveAssets(files);
   }
+
+  /**
+   * Save asset thumbnail to the file
+   */
+  static saveThumbnail(
+    id: string,
+    filename: string,
+    width: number,
+    height: number,
+  ) {
+    return RNCameraroll.saveThumbnail(id, filename, width, height);
+  }
 }
