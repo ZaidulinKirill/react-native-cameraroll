@@ -216,8 +216,10 @@ public class Cameraroll: NSObject {
             let options = PHImageRequestOptions()
             options.isNetworkAccessAllowed = true
             options.deliveryMode = .highQualityFormat
+            options.isSynchronous = true
 
-            PHImageManager.default().requestImage(for: asset!, targetSize: CGSize(width: width, height: height), contentMode: .aspectFill, options: options) { image, error in
+            let targetSize = (width == -1 || height == -1) ? PHImageManagerMaximumSize : CGSize(width: width, height: height)
+            PHImageManager.default().requestImage(for: asset!, targetSize: targetSize, contentMode: .aspectFill, options: options) { image, error in
                 if (image == nil) {
                     reject("Error", "Unexpected error", nil)
                     return
