@@ -164,14 +164,14 @@ export class CameraRoll {
   }
 
   /**
-   * Save asset thumbnail to the file
+   * Extract asset thumbnail to the file
    */
-  static saveThumbnail(
+  static extractThumbnail(
     id: string,
     filename: string,
     width: number,
     height: number,
   ) {
-    return RNCameraroll.saveThumbnail(id, filename, width, height);
+    return RNCameraroll.extractThumbnail(id, filename, width, height);
   }
 }

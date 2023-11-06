@@ -206,8 +206,8 @@ public class Cameraroll: NSObject {
         }
     }
 
-    @objc(saveThumbnail:withFilename:withWidth:withHeight:withResolver:withRejecter:)
-    func saveThumbnail(id: String, filename: String, width: Int, height: Int, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+    @objc(extractThumbnail:withFilename:withWidth:withHeight:withResolver:withRejecter:)
+    func extractThumbnail(id: String, filename: String, width: Int, height: Int, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
 
         if fetchResult.count > 0 {
@@ -215,6 +215,7 @@ public class Cameraroll: NSObject {
 
             let options = PHImageRequestOptions()
             options.isNetworkAccessAllowed = true
+            options.deliveryMode = .highQualityFormat
 
             PHImageManager.default().requestImage(for: asset!, targetSize: CGSize(width: width, height: height), contentMode: .aspectFill, options: options) { image, error in
                 if (image == nil) {
@@ -222,9 +223,18 @@ public class Cameraroll: NSObject {
                     return
                 }
 
-                if let data = image!.jpegData(compressionQuality: 1) {
-                    try? data.write(to: URL(string: filename)!)
-                    resolve(nil)
+                if let data = image!.jpegData(compressionQuality: 0.8) {
+                    do {
+                        let url = URL(fileURLWithPath: filename)
+                        try data.write(to: url)
+
+                        resolve(nil)
+                    }
+                    catch {
+                        reject("Error", "Unexpected error", nil)
+                    }
+                    
+                    
                 } else {
                     reject("Error", "Unexpected error", nil)
                 }
