@@ -206,6 +206,27 @@ public class Cameraroll: NSObject {
         }
     }
 
+    @objc(saveAssets:withResolver:withRejecter:)
+    func saveAssets(files: [String], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        guard checkPhotoLibraryAccess(reject: reject) else {
+            return
+        }
+
+        for uri in files {
+            if let url = URL(string: uri) {
+                if let data = try? Data(contentsOf: url) {
+                    if let image = UIImage(data: data) {
+                        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    } else {
+                        UISaveVideoAtPathToSavedPhotosAlbum(url.path, nil, nil, nil)
+                    }
+                }
+            }
+        }
+        
+        resolve(nil)
+    }
+
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {
         var statuses = [PHAuthorizationStatus.authorized]
         if #available(iOS 14, *) {

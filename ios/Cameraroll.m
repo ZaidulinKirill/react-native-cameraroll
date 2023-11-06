@@ -20,6 +20,11 @@ RCT_EXTERN_METHOD(getAssetVideoInfo:(NSString *) id
                   withRejecter:(RCTPromiseRejectBlock)reject
 )
 
+RCT_EXTERN_METHOD(saveAssets:(NSArray *) files
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
 + (BOOL)requiresMainQueueSetup
 {
   return NO;
