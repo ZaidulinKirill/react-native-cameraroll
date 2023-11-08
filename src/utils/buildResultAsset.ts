@@ -7,7 +7,7 @@ export function buildResultAsset(item: any) {
       ...(item.id != null && { uri: `ph://${item.id}` }),
       ...(item.name != null && { name: item.name }),
       ...(item.mediaType != null && {
-        type:
+        mediaType:
           item.mediaType === 1
             ? 'image'
             : item.mediaType === 2

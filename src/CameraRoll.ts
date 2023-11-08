@@ -159,7 +159,7 @@ export class CameraRoll {
   /**
    * Save assets to Camera Roll
    */
-  static saveAssets(files: string[]) {
+  static saveAssets(files: string[]): Promise<void> {
     return RNCameraroll.saveAssets(files);
   }
 
@@ -171,14 +171,15 @@ export class CameraRoll {
     filename: string,
     width: number,
     height: number,
-  ) {
+  ): Promise<void> {
     return RNCameraroll.extractThumbnail(id, filename, width, height);
   }
 
   /**
    * Fetch asset full size file url
    */
-  static fetchAssetFullSizeURL(id: string) {
-    return RNCameraroll.fetchAssetFullSizeURL(id);
+  static async fetchAssetFullSizeURL(id: string): Promise<string | null> {
+    const { url } = await RNCameraroll.fetchAssetFullSizeURL(id);
+    return url;
   }
 }
