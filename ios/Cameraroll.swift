@@ -278,18 +278,18 @@ public class Cameraroll: NSObject {
         let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
 
         if fetchResult.count > 0 {
-            let asset = fetchResult.firstObject
+            let asset = fetchResult.firstObject!
 
             let options = PHContentEditingInputRequestOptions()
             options.canHandleAdjustmentData = { _ in true }
             
             asset.requestContentEditingInput(with: options) { (input, _) in
                 guard let url = input?.fullSizeImageURL else {
-                    resolve(["url": url])
+                    resolve(["url": nil])
                     return
                 }
 
-                resolve(["url": nil])
+                resolve(["url": url.absoluteString])
             }
         } else {
             reject("Error", "Asset not found", nil)
