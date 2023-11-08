@@ -272,6 +272,30 @@ public class Cameraroll: NSObject {
         resolve(nil)
     }
 
+
+    @objc(fetchAssetFullSizeURL:withResolver:withRejecter:)
+    func fetchAssetFullSizeURL(id: String, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
+        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
+
+        if fetchResult.count > 0 {
+            let asset = fetchResult.firstObject
+
+            let options = PHContentEditingInputRequestOptions()
+            options.canHandleAdjustmentData = { _ in true }
+            
+            asset.requestContentEditingInput(with: options) { (input, _) in
+                guard let url = input?.fullSizeImageURL else {
+                    resolve(["url": url])
+                    return
+                }
+
+                resolve(["url": nil])
+            }
+        } else {
+            reject("Error", "Asset not found", nil)
+        }
+    }
+
     func checkPhotoLibraryAccess(reject: RCTPromiseRejectBlock?) -> Bool {
         var statuses = [PHAuthorizationStatus.authorized]
         if #available(iOS 14, *) {

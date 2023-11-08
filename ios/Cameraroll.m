@@ -33,6 +33,13 @@ RCT_EXTERN_METHOD(extractThumbnail:(NSString *)id
                   withRejecter:(RCTPromiseRejectBlock)reject
 )
 
+RCT_EXTERN_METHOD(fetchAssetFullSizeURL:(NSString *)id
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
+
+
 + (BOOL)requiresMainQueueSetup
 {
   return NO;

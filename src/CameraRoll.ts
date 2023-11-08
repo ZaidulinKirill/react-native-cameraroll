@@ -174,4 +174,11 @@ export class CameraRoll {
   ) {
     return RNCameraroll.extractThumbnail(id, filename, width, height);
   }
+
+  /**
+   * Fetch asset full size file url
+   */
+  static fetchAssetFullSizeURL(id: string) {
+    return RNCameraroll.fetchAssetFullSizeURL(id);
+  }
 }
