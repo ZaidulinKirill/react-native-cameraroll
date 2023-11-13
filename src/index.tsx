@@ -4,7 +4,12 @@ export * from './CameraRoll';
 export * from './types';
 
 export { useGalleryCleaner } from './hooks/useGalleryCleaner';
-export { GalleryCleanerProvider } from './contexts/GalleryCleanerContext';
+export {
+  GalleryCleanerProvider,
+  GalleryFetchStatus,
+  GalleryCleanerAlbum,
+  GalleryAssetsGroup,
+} from './contexts/GalleryCleanerContext';
 
 export const fetchAssets = CameraRoll.getAssets;
 export const fetchAssetsCount = CameraRoll.getAssetsCount;
