@@ -93,7 +93,7 @@ export class CameraRoll {
     );
 
     return groups.map((items: any[]) =>
-      items.map((x) => buildResultAsset({ ...x, mediaType: 'image' })),
+      items.map((x) => buildResultAsset({ ...x, mediaType: 1 })),
     );
   }
 
@@ -120,9 +120,7 @@ export class CameraRoll {
 
     onFinished?.(processedIds);
 
-    return items.map((x: any) =>
-      buildResultAsset({ ...x, mediaType: 'image' }),
-    );
+    return items.map((x: any) => buildResultAsset({ ...x, mediaType: 1 }));
   }
 
   /**
