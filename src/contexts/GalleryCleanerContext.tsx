@@ -225,8 +225,11 @@ export function GalleryCleanerProvider({ children }: PropsWithChildren) {
   const deleteAssets = useCallback(async (assetIds: string[]) => {
     const { status } = await checkPermissionStatus(
       Platform.OS === 'ios'
-        ? 'ios.permission.CONTACTS'
-        : 'android.permission.WRITE_CONTACTS',
+        ? 'ios.permission.PHOTO_LIBRARY'
+        : [
+            'android.permission.READ_MEDIA_IMAGES',
+            'android.permission.READ_MEDIA_VIDEO',
+          ],
     );
     if (status === 'blocked') {
       // @ts-ignore
