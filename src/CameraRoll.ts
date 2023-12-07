@@ -38,6 +38,17 @@ export class CameraRoll {
 
             return undefined;
           })(),
+          sortBy: params.sortBy?.map((x) => {
+            const key = (() => {
+              if (x.key === 'createdAt') {
+                return 'creationDate';
+              }
+
+              return x.key;
+            })();
+
+            return { key, asc: x.asc };
+          }),
           collectionSubType: (() => {
             if (params.collectionSubType === 'selfies') {
               return 210;
