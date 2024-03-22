@@ -77,7 +77,14 @@ export function GalleryCleanerProvider({ children }: PropsWithChildren) {
       const items = await CameraRoll.getAssets({
         collectionType: 'smartAlbum',
         collectionSubType: album,
-        select: ['id', 'createdAt', 'name', 'size', 'uri'],
+        select: [
+          'id',
+          'createdAt',
+          'name',
+          'size',
+          'uri',
+          ...(album === 'videos' ? ['duration' as const] : []),
+        ],
       });
 
       return {
