@@ -24,6 +24,9 @@ export function buildResultAsset(item: any) {
       ...(item.isFavorite != null && {
         isFavorite: item.isFavorite,
       }),
+      ...(item.duration != null && {
+        duration: item.duration,
+      }),
     };
   }
 
@@ -44,6 +47,9 @@ export function buildResultAsset(item: any) {
       }),
       ...(item.createdAt != null && {
         createdAt: new Date(parseInt(item.createdAt, 10) * 1000).toISOString(),
+      }),
+      ...(item.duration != null && {
+        duration: item.duration,
       }),
     };
   }
