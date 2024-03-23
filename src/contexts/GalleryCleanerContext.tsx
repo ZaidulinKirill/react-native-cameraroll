@@ -98,6 +98,9 @@ export function GalleryCleanerProvider({ children }: PropsWithChildren) {
             createdAt: x.createdAt!,
             size: x.size,
             mediaType: album === 'videos' ? 'video' : 'image',
+            ...(album === 'videos' && {
+              duration: x.duration ?? 0,
+            }),
           })),
       } as any;
     }
