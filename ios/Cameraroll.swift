@@ -89,6 +89,8 @@ public class Cameraroll: NSObject {
             "createdAt": select?.contains("createdAt") ?? false,
             "isFavorite": select?.contains("isFavorite") ?? false,
             "duration": select?.contains("duration") ?? false,
+            "width": select?.contains("width") ?? false,
+            "height": select?.contains("height") ?? false,
         ]
 
         let items = assets.map { asset in
@@ -106,6 +108,8 @@ public class Cameraroll: NSObject {
             if includes["createdAt"]! { dict["createdAt"] = createdAt?.timeIntervalSince1970 ?? -1 }
             if includes["isFavorite"]! { dict["isFavorite"] = asset.isFavorite }
             if includes["duration"]! { dict["duration"] = asset.duration }
+            if includes["width"]! { dict["width"] = asset.pixelWidth }
+            if includes["height"]! { dict["height"] = asset.pixelHeight }
 
             return dict
         }

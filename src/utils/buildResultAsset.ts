@@ -27,6 +27,12 @@ export function buildResultAsset(item: any) {
       ...(item.duration != null && {
         duration: item.duration,
       }),
+      ...(item.width != null && {
+        width: item.width,
+      }),
+      ...(item.height != null && {
+        height: item.height,
+      }),
     };
   }
 
@@ -50,6 +56,12 @@ export function buildResultAsset(item: any) {
       }),
       ...(item.duration != null && {
         duration: item.duration,
+      }),
+      ...(item.width != null && {
+        width: item.width,
+      }),
+      ...(item.height != null && {
+        height: item.height,
       }),
     };
   }

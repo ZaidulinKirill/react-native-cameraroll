@@ -83,6 +83,8 @@ export function GalleryCleanerProvider({ children }: PropsWithChildren) {
           'name',
           'size',
           'uri',
+          'width',
+          'height',
           ...(album === 'videos' ? ['duration' as const] : []),
         ],
       });
@@ -97,6 +99,8 @@ export function GalleryCleanerProvider({ children }: PropsWithChildren) {
             name: x.name!,
             createdAt: x.createdAt!,
             size: x.size,
+            width: x.width,
+            height: x.height,
             mediaType: album === 'videos' ? 'video' : 'image',
             ...(album === 'videos' && {
               duration: x.duration ?? 0,

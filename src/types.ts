@@ -12,7 +12,9 @@ export type SelectKey =
   | 'createdAt'
   | 'uri'
   | 'isFavorite'
-  | 'duration';
+  | 'duration'
+  | 'width'
+  | 'height';
 
 /**
  * Fetching params
@@ -68,6 +70,8 @@ export type GalleryAsset = {
   uri?: string;
   isFavorite?: boolean;
   duration?: number;
+  width?: number;
+  height?: number;
 };
 
 /**
