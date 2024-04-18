@@ -81,16 +81,26 @@ public class Cameraroll: NSObject {
             }
         }
 
+        let includeId = select == nil || select!.contains("id")
+        let includeName = select?.contains("name") ?? false
+        let includeMediaType = select?.contains("mediaType") ?? false
+        let includeSize = select?.contains("size") ?? false
+        let includeCreatedAt = select?.contains("createdAt") ?? false
+        let includeIsFavorite = select?.contains("isFavorite") ?? false
+        let includeDuration = select?.contains("duration") ?? false
+        let includeWidth = select?.contains("width") ?? false
+        let includeHeight = select?.contains("height") ?? false
+
         let includes = [
-            "id": select == nil || select!.contains("id"),
-            "name": select?.contains("name") ?? false,
-            "mediaType": select?.contains("mediaType") ?? false,
-            "size": select?.contains("size") ?? false,
-            "createdAt": select?.contains("createdAt") ?? false,
-            "isFavorite": select?.contains("isFavorite") ?? false,
-            "duration": select?.contains("duration") ?? false,
-            "width": select?.contains("width") ?? false,
-            "height": select?.contains("height") ?? false,
+            "id": includeId,
+            "name": includeName,
+            "mediaType": includeMediaType,
+            "size": includeSize,
+            "createdAt": includeCreatedAt,
+            "isFavorite": includeIsFavorite,
+            "duration": includeDuration,
+            "width": includeWidth,
+            "height": includeHeight,
         ]
 
         let items = assets.map { asset in
