@@ -7,6 +7,9 @@
 
 #import "RNCAssetsLibraryRequestHandler.h"
 
+#if RCT_NEW_ARCH_ENABLED
+#else
+
 #import <stdatomic.h>
 #import <dlfcn.h>
 #import <objc/runtime.h>
@@ -214,3 +217,6 @@ RCT_EXPORT_MODULE()
 
 
 @end
+
+
+#endif

@@ -10,6 +10,11 @@
 
 @class PHPhotoLibrary;
 
+#if RCT_NEW_ARCH_ENABLED
+#else
+
 @interface RNCAssetsLibraryRequestHandler : NSObject <RCTURLRequestHandler>
 
 @end
+
+#endif
