@@ -104,7 +104,7 @@ export class CameraRoll {
     );
 
     return groups.map((items: any[]) =>
-      items.map((x) => buildResultAsset({ ...x, mediaType: 1 })),
+      items.map((x) => buildResultAsset({ ...x, name: '', mediaType: 1 })),
     );
   }
 
@@ -114,7 +114,7 @@ export class CameraRoll {
   static async findBlurryImages({
     ignoreIds = [],
     threshold = 5,
-    itemsPerPage = 500,
+    itemsPerPage = 250,
     onFinished,
   }: {
     ignoreIds?: string[];
@@ -131,7 +131,9 @@ export class CameraRoll {
 
     onFinished?.(processedIds);
 
-    return items.map((x: any) => buildResultAsset({ ...x, mediaType: 1 }));
+    return items.map((x: any) =>
+      buildResultAsset({ ...x, name: '', mediaType: 1 }),
+    );
   }
 
   /**

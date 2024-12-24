@@ -104,10 +104,8 @@ public class Cameraroll: NSObject {
         ]
 
         let items = assets.map { asset in
-            let resources = PHAssetResource.assetResources(for: asset)
-            let resource = resources.first
-            let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
-            let originalFilename = resource?.originalFilename
+            let size = asset.pixelWidth * asset.pixelHeight / 5
+            let originalFilename = "" //resource?.originalFilename
             let createdAt = asset.creationDate
 
             var dict = [String: Any]()
@@ -126,7 +124,7 @@ public class Cameraroll: NSObject {
 
         resolve(["items": items])
     }
-
+    
     @objc(editIsFavorite:withValue:withResolver:withRejecter:)
     func editIsFavorite(id: String, value: Bool, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         guard checkPhotoLibraryAccess(reject: reject) else {

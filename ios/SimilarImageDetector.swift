@@ -7,7 +7,7 @@ public class SimilarImageDetector: NSObject {
     }
 
     public func fetchImagesFromGallery(resultHandler: @escaping ([PHAsset]) -> Void) {
-        PHPhotoLibrary.requestAuthorization { status in
+       PHPhotoLibrary.requestAuthorization { status in
             switch status {
             case .authorized:
                 let fetchOptions = PHFetchOptions()
@@ -25,7 +25,7 @@ public class SimilarImageDetector: NSObject {
                     results.append(asset)
                 }
 
-                resultHandler(results)
+              resultHandler(results)
             case .denied, .restricted:
                 print("Not allowed")
             case .notDetermined:
@@ -43,18 +43,14 @@ public class SimilarImageDetector: NSObject {
 
         for i in 0 ..< assets.count {
             let asset = assets[i]
-
-            let resources = PHAssetResource.assetResources(for: asset)
-            let resource = resources.first
-            let size = resources.map { $0.value(forKey: "fileSize") as? Int64 ?? 0 }.reduce(0) { acc, item in acc + item }
-            let originalFilename = resource?.originalFilename
+            
+            let originalFilename = "" // resource?.originalFilename
             let createdAt = asset.creationDate
-
+            
             resuls.append([
                 "id": asset.localIdentifier,
-                "name": originalFilename ?? "",
                 "createdAt": createdAt?.timeIntervalSince1970 ?? -1,
-                "size": size,
+                "size": asset.pixelWidth * asset.pixelHeight / 5, //size,
             ])
         }
 
